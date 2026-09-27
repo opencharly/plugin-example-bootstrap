@@ -10,6 +10,7 @@ package examplebootstrap
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
 	"fmt"
 
@@ -17,19 +18,24 @@ import (
 	pb "github.com/opencharly/spec/proto"
 )
 
+//go:embed schema/*.cue
+var schemaFS embed.FS
+
 const calver = "2026.181.0001"
 
 // NewProvider returns the bootstrap provider for in-proc (compiled-in) registration or out-of-proc serving.
 func NewProvider() pb.ProviderServer { return &provider{} }
 
-// NewMeta advertises the capability with Phase "bootstrap" (F9) via sdk.NewMeta →
+// NewMeta advertises the capability with Phase "bootstrap" (F9) together with this plugin's
+// OWN self-contained CUE schema (schema/examplebootstrap.cue) via sdk.NewMeta →
 // BuildCapabilities — the host enumerates it in the bootstrap phase (providersInPhase)
 // and invokes OpBootstrap before config validation. No InputDef: a bootstrap plugin is
-// invoked with the raw config, not a structured plugin_input.
+// invoked with the raw config, not a structured plugin_input; there is NO schema-less
+// plugin, the schema is the uniform surface every plugin presents.
 func NewMeta() pb.PluginMetaServer {
 	return sdk.NewMeta(calver,
 		[]sdk.ProvidedCapability{{Class: "verb", Word: "examplebootstrap", Phase: sdk.PhaseBootstrap}},
-		nil)
+		schemaFS)
 }
 
 type provider struct{ pb.UnimplementedProviderServer }
