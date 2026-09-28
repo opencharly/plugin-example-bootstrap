@@ -1,7 +1,5 @@
-version: 2026.232.0520
 plugin-example-bootstrap:
     candy:
-        version: 2026.181.0001
         description: |-
             Reference BOOTSTRAP-PHASE plugin (F9) — a compiled-in plugin declaring Phase=bootstrap,
             so the kernel invokes its OpBootstrap on the RAW project config bytes BEFORE config
